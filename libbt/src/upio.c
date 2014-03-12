@@ -167,8 +167,20 @@ static int init_rfkill()
 
         if (sz >= 9 && memcmp(buf, "bluetooth", 9) == 0)
         {
-            rfkill_id = id;
-            break;
+            snprintf(path, sizeof(path), "/sys/class/rfkill/rfkill%d/name", id);
+            fd = open(path, O_RDONLY);
+            if (fd < 0)
+            {
+                ALOGE("init_rfkill : open(%s) failed: %s (%d)\n",       \
+                      path, strerror(errno), errno);
+                return -1;
+            }
+
+            if (sz >= 4 && memcmp(buf, "hci", 3) == 0)
+            {
+                rfkill_id = id;
+                break;
+            }
         }
     }
 

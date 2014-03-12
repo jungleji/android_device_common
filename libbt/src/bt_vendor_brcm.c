@@ -41,6 +41,26 @@
 #define BTVNDDBG(param, ...) {}
 #endif
 
+#define CASE_RETURN_STR(const) case const: return #const;
+
+const char* dump_opcode(int event)
+{
+    switch(event)
+    {
+        CASE_RETURN_STR(BT_VND_OP_POWER_CTRL)
+        CASE_RETURN_STR(BT_VND_OP_FW_CFG)
+        CASE_RETURN_STR(BT_VND_OP_SCO_CFG)
+        CASE_RETURN_STR(BT_VND_OP_USERIAL_OPEN)
+        CASE_RETURN_STR(BT_VND_OP_USERIAL_CLOSE)
+        CASE_RETURN_STR(BT_VND_OP_GET_LPM_IDLE_TIMEOUT)
+        CASE_RETURN_STR(BT_VND_OP_LPM_SET_MODE)
+        CASE_RETURN_STR(BT_VND_OP_LPM_WAKE_SET_STATE)
+
+        default:
+            return "UNKNOWN OP CODE";
+     }
+}
+
 /******************************************************************************
 **  Externs
 ******************************************************************************/
@@ -131,13 +151,14 @@ static int op(bt_vendor_opcode_t opcode, void *param)
 {
     int retval = 0;
 
-    BTVNDDBG("op for %d", opcode);
+    BTVNDDBG("op for %s", dump_opcode(opcode));
 
     switch(opcode)
     {
         case BT_VND_OP_POWER_CTRL:
             {
                 int *state = (int *) param;
+                BTVNDDBG("power state for %d", *state);
                 if (*state == BT_VND_PWR_OFF)
                     upio_set_bluetooth_power(UPIO_BT_POWER_OFF);
                 else if (*state == BT_VND_PWR_ON) {
